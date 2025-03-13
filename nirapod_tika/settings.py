@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+import cloudinary
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,14 +14,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3g2js-8hs1-ib%zz^3!w5o75vi1=-wyxwe7&nxmxtj&&0g9)=z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1']
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,7 +38,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,19 +67,28 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'nirapod_tika.wsgi.application'
+WSGI_APPLICATION = 'nirapod_tika.wsgi.app'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('dbname'),
+        'USER': config('user'),
+        'PASSWORD': config('password'),
+        'HOST': config('host'),
+        'PORT': config('port')
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -95,6 +108,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+cloudinary.config( 
+    cloud_name = config('cloud_name'), 
+    api_key = config('api_key'), 
+    api_secret = config('api_secret'), 
+    secure=True
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -112,6 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

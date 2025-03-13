@@ -2,6 +2,7 @@
 db.sqlite3
 .env
 __pycache__/
+.NirapodTika_env
 *.pyc
 *.pyo
 *.pyd

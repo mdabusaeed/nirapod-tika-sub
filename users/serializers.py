@@ -15,31 +15,13 @@ class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         ref_name = "CustomUserSerializer"
         fields = ('id', 'phone_number','nid', 'first_name', 'last_name', 'address', 'email','medical_details')
-        extra_kwargs = {
-            'phone_number': {'required': False},
-            'nid': {'required': False},
-            'first_name': {'required': False},
-            'last_name': {'required': False},
-            'email': {'required': False},
-            'address': {'required': False},
-            'medical_details': {'required': False}
-        }
+
 
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'nid', 'first_name', 'last_name', 'address', 'email', 'specialization', 'profile_picture', 'medical_details')
-        extra_kwargs = {
-            'phone_number': {'required': False},
-            'nid': {'required': False},
-            'first_name': {'required': False},
-            'last_name': {'required': False},
-            'email': {'required': False},
-            'address': {'required': False},
-            'medical_details': {'required': False},
-            'specialization': {'required': False},
-            'profile_picture': {'required': False},
-        }
+
     profile_picture = serializers.ImageField(required=False)
 
     
