@@ -41,7 +41,7 @@ class VaccinationScheduleViewSet(ModelViewSet):
             patient=patient,
             vaccine=vaccine,
             dose_dates=dose_dates,
-            payment_method=payment_method
+            payment_method=payment_method,
             status='pending' if payment_method == 'online' else 'confirmed'
         )
 
