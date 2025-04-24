@@ -174,7 +174,7 @@ DJOSER = {
 STRIPE_TEST_SECRET_KEY = 'sk_test_4eC39HqLyjWDarjtT1zdp7dc'
 STRIPE_TEST_PUBLISHABLE_KEY = 'pk_test_TYooMQauvdEDq54NiTphI7jx'
 
-
+# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
@@ -182,3 +182,17 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 # EMAIL_USE_SSL = False 
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+# Swagger Configuration
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'DOC_EXPANSION': 'none',
+}
