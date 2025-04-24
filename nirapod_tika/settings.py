@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'api',
     'users',
     'vaccination',
+    'order',
 ]
 
 MIDDLEWARE = [

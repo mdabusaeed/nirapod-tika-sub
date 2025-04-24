@@ -3,12 +3,14 @@ from users.models import User
 from datetime import timedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 
 class Vaccine(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2) 
+    stock = models.PositiveBigIntegerField()
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
     doses_required = models.IntegerField(default=1) 
     dose_intervals = models.JSONField(default=list) 
@@ -20,6 +22,7 @@ class Vaccine(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.doses_required} doses, intervals {self.dose_intervals})"
+
 
 
 class VaccineCampaign(models.Model):
