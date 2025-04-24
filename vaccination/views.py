@@ -7,9 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import  IsAdminUser
 from .models import Vaccine, VaccinationSchedule, VaccineReview, VaccineCampaign, Payment
 from .serializers import VaccineSerializer, VaccinationScheduleSerializer, VaccineReviewSerializer, VaccineCampaignSerializer
-import stripe
 from django.conf import settings
-stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 class VaccineViewSet(ModelViewSet):
     queryset = Vaccine.objects.all()
@@ -44,48 +42,29 @@ class VaccinationScheduleViewSet(ModelViewSet):
             vaccine=vaccine,
             dose_dates=dose_dates,
             payment_method=payment_method
+            status='pending' if payment_method == 'online' else 'confirmed'
         )
 
-        amount = vaccine.price  
+        # ডামি পেমেন্ট রেকর্ড তৈরি
+        payment = Payment.objects.create(
+            schedule=schedule,
+            amount=vaccine.price,
+            payment_method=payment_method,
+            payment_status='pending' if payment_method == 'online' else 'completed',
+            transaction_id=f"dummy_{schedule.id}"  # ডামি ট্রানজেকশন আইডি
+        )
 
-        if payment_method == 'online':
-            try:
-                payment_intent = stripe.PaymentIntent.create(
-                    amount=amount * 100, 
-                    currency="usd",
-                    metadata={"integration_check": "accept_a_payment"}
-                )
-
-                payment = Payment.objects.create(
-                    schedule=schedule,
-                    amount=amount,
-                    payment_method='online',
-                    payment_status='pending',
-                    transaction_id=payment_intent.id
-                )
-
-                return Response({
-                    "client_secret": payment_intent.client_secret
-                }, status=status.HTTP_200_OK)
-
-            except stripe.error.StripeError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            payment = Payment.objects.create(
-                schedule=schedule,
-                amount=amount,  
-                payment_method='cod',
-                payment_status='completed',  
-            )
-            return Response({"message": "Booking confirmed with Cash on Delivery"}, status=status.HTTP_200_OK)
+        return Response({
+            "message": "Schedule created successfully",
+            "schedule_id": schedule.id,
+            "payment_status": payment.payment_status,
+            "next_step": "Confirm payment from frontend" if payment_method == 'online' else "Booking confirmed"
+        }, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-
         user = self.request.user
         if user.role != 'doctor':
-            return Response({"error": "Only doctors can modify vaccine schedules."}, status=status.HTTP_403_FORBIDDEN)
-
+            return Response({"error": "Only doctors can modify schedules."}, status=status.HTTP_403_FORBIDDEN)
         return super().update(request, *args, **kwargs)
 
 
