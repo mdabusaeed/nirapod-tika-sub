@@ -70,7 +70,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'nirapod_tika.wsgi.app'
 
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
