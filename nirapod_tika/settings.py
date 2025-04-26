@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg', 
     'rest_framework',
+    'django_filters',
+    'corsheaders',
     'djoser',
     'api',
     'users',
@@ -43,6 +45,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -151,8 +154,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # my Addons
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
-    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
     # ],
