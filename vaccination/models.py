@@ -23,7 +23,9 @@ class Vaccine(models.Model):
     def __str__(self):
         return f"{self.name} ({self.doses_required} doses, intervals {self.dose_intervals})"
 
-
+class VaccineImage(models.Model):
+    vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE, related_name='images')
+    image = CloudinaryField('image')
 
 class VaccineCampaign(models.Model):
     name = models.CharField(max_length=255, unique=True)
