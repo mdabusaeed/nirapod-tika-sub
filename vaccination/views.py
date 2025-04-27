@@ -101,7 +101,4 @@ class VaccineCampaignViewSet(ModelViewSet):
     serializer_class = VaccineCampaignSerializer
     permission_classes = [IsAdminUser]
 
-    def perform_create(self, serializer):
-        images = self.request.FILES.getlist('images')
-        for image in images:
-            VaccineImage.objects.create(vaccine=serializer.instance, image=image)
+
