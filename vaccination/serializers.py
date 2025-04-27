@@ -80,12 +80,24 @@ class VaccineReviewSerializer(serializers.ModelSerializer):
 
 class VaccineCampaignSerializer(serializers.ModelSerializer):
     images = VaccinationImageSerializer(many=True, read_only=True)
-    vaccines = serializers.SerializerMethodField()
+    vaccines = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Vaccine.objects.all(),
+        write_only=True  # POST-এ IDs গ্রহণ করবে
+    )
+    vaccine_names = serializers.SerializerMethodField(read_only=True)  # GET-এ names ফেরত দেবে
+
     class Meta:
         model = VaccineCampaign
-        fields = ['id', 'name', 'description', 'location', 'start_date', 'end_date', 'vaccines', 'images']
+        fields = ['id', 'name', 'description', 'location', 'start_date', 'end_date', 'vaccines', 'vaccine_names', 'images']
 
-    def get_vaccines(self, obj):
-        # Return a list of vaccine names for the campaign
+    def get_vaccine_names(self, obj):
         return [vaccine.name for vaccine in obj.vaccines.all()]
+
+    def to_representation(self, instance):
+        # GET রিকোয়েস্টে 'vaccines' ফিল্ডকে 'vaccine_names' দিয়ে রিপ্লেস করো
+        ret = super().to_representation(instance)
+        ret['vaccines'] = ret.pop('vaccine_names')
+        return ret
+    
     
