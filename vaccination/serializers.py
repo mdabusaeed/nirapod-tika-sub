@@ -3,14 +3,13 @@ from .models import Vaccine, VaccineReview, VaccineCampaign, VaccinationSchedule
 
 
 class VaccinationImageSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField()
     class Meta:
         model = VaccineImage
         fields = ['id', 'image']
 
 class VaccineSerializer(serializers.ModelSerializer):
     created_by = serializers.StringRelatedField() 
-
+    images = VaccinationImageSerializer(many=True, read_only=True)
     class Meta:
         model = Vaccine
         fields = ['id', 'name','price', 'manufacturer', 'dose_intervals', 'doses_required','created_by', "images"]
