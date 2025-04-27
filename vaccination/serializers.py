@@ -1,14 +1,19 @@
 from rest_framework import serializers
-from .models import Vaccine, VaccinationSchedule, VaccinationSchedule, VaccineReview, VaccineCampaign, Payment
+from .models import Vaccine, VaccineReview, VaccineCampaign, VaccinationSchedule, VaccineImage
 
 
+class VaccinationImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+    class Meta:
+        model = VaccineImage
+        fields = ['id', 'image']
 
 class VaccineSerializer(serializers.ModelSerializer):
     created_by = serializers.StringRelatedField() 
 
     class Meta:
         model = Vaccine
-        fields = ['id', 'name','price', 'manufacturer', 'dose_intervals', 'doses_required','created_by']
+        fields = ['id', 'name','price', 'manufacturer', 'dose_intervals', 'doses_required','created_by', "images"]
         # read_only_fields = ['created_by']  
 
 
@@ -77,4 +82,6 @@ class VaccineReviewSerializer(serializers.ModelSerializer):
 class VaccineCampaignSerializer(serializers.ModelSerializer):
     class Meta:
         model = VaccineCampaign
-        fields = ['id', 'name', 'description', 'start_date', 'end_date', 'vaccines']
+        fields = ['id', 'name', 'description', 'start_date', 'end_date', 'vaccines', 'images']
+
+  

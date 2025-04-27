@@ -8,6 +8,7 @@ from rest_framework.permissions import  IsAdminUser
 from .models import Vaccine, VaccinationSchedule, VaccineReview, VaccineCampaign, Payment
 from .serializers import VaccineSerializer, VaccinationScheduleSerializer, VaccineReviewSerializer, VaccineCampaignSerializer
 from django.conf import settings
+from .models import VaccineImage
 
 class VaccineViewSet(ModelViewSet):
     queryset = Vaccine.objects.all()
@@ -17,6 +18,9 @@ class VaccineViewSet(ModelViewSet):
         if self.request.user.role != 'doctor':
             raise PermissionDenied("Only doctors can add vaccines.")
         serializer.save(created_by=self.request.user)  
+        images = self.request.FILES.getlist('images')
+        for image in images:
+            VaccineImage.objects.create(vaccine=serializer.instance, image=image)
 
 class VaccinationScheduleViewSet(ModelViewSet):
     serializer_class = VaccinationScheduleSerializer
@@ -96,3 +100,8 @@ class VaccineCampaignViewSet(ModelViewSet):
     queryset = VaccineCampaign.objects.all()
     serializer_class = VaccineCampaignSerializer
     permission_classes = [IsAdminUser]
+
+    def perform_create(self, serializer):
+        images = self.request.FILES.getlist('images')
+        for image in images:
+            VaccineImage.objects.create(vaccine=serializer.instance, image=image)
