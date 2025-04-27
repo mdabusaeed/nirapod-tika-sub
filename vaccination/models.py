@@ -27,9 +27,12 @@ class VaccineImage(models.Model):
     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE, related_name='images')
     image = CloudinaryField('image')
 
+    
+
 class VaccineCampaign(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     vaccines = models.ManyToManyField('Vaccine')  

@@ -82,6 +82,6 @@ class VaccineCampaignSerializer(serializers.ModelSerializer):
     images = VaccinationImageSerializer(many=True, read_only=True)
     class Meta:
         model = VaccineCampaign
-        fields = ['id', 'name', 'description', 'start_date', 'end_date', 'vaccines', 'images']
+        fields = ['id', 'name', 'description', 'location', 'start_date', 'end_date', 'vaccines', 'images']
 
   
