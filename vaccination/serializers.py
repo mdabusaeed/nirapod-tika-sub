@@ -80,6 +80,7 @@ class VaccineReviewSerializer(serializers.ModelSerializer):
 
 class VaccineCampaignSerializer(serializers.ModelSerializer):
     images = VaccinationImageSerializer(many=True, read_only=True)
+    vaccines = serializers.SerializerMethodField()
     class Meta:
         model = VaccineCampaign
         fields = ['id', 'name', 'description', 'location', 'start_date', 'end_date', 'vaccines', 'images']
@@ -87,3 +88,4 @@ class VaccineCampaignSerializer(serializers.ModelSerializer):
     def get_vaccines(self, obj):
         # Return a list of vaccine names for the campaign
         return [vaccine.name for vaccine in obj.vaccines.all()]
+    
