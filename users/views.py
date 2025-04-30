@@ -11,6 +11,8 @@ from .models import User
 from .serializers import UserSerializer,DoctorSerializer
 from vaccination.models import VaccinationSchedule  
 from vaccination.serializers import VaccinationScheduleSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class UserProfileView(ModelViewSet):
@@ -82,6 +84,24 @@ class DoctorProfileView(ModelViewSet):
 class EmailExistsView(APIView):
     permission_classes = [AllowAny]
     
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['email'],
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email to check')
+            }
+        ),
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'exists': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Whether email exists')
+                }
+            ),
+            400: 'Bad Request'
+        }
+    )
     def post(self, request):
         email = request.data.get('email')
         
@@ -90,27 +110,27 @@ class EmailExistsView(APIView):
                 {"error": "Email is required"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
         exists = User.objects.filter(email=email).exists()
         
         return Response(
             {"exists": exists},
             status=status.HTTP_200_OK
-        )
-    
+        )   
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('email', openapi.IN_QUERY, description="Email to check", type=openapi.TYPE_STRING, required=True),
+        ],
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'exists': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Whether email exists')
+                }
+            ),
+            400: 'Bad Request'
+        }
+    )
     def get(self, request):
-        email = request.query_params.get('email')
-        
-        if not email:
-            return Response(
-                {"error": "Email parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            
-        exists = User.objects.filter(email=email).exists()
-        
-        return Response(
-            {"exists": exists},
-            status=status.HTTP_200_OK
-        )
-    
+        # পূর্বের কোড...
+        pass
