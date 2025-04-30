@@ -4,6 +4,7 @@ from users.views import UserProfileView
 from vaccination.views import VaccineViewSet, VaccinationScheduleViewSet, VaccineReviewViewSet, VaccineCampaignViewSet
 from users.views import UserProfileView,DoctorProfileView, EmailExistsView
 from order.views import OrderViewSet, CartViewSet, CartItemViewSet    
+from users.views import resend_activation_email, activate_user
 
 router = routers.DefaultRouter()
 router.register('patient-profile', UserProfileView, basename='patient-profile')
@@ -21,6 +22,7 @@ carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 carts_router.register('items', CartItemViewSet, basename='cart-item')
 
 
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(product_router.urls)),
@@ -29,4 +31,6 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
     path('check-email/', EmailExistsView.as_view(), name='check-email'),
+    path('activate/<str:uid>/<str:token>/', activate_user, name='activate_user'),
+    path('resend-activation/', resend_activation_email, name='resend_activation_email'),    
 ]
