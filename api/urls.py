@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework_nested import routers
 from users.views import UserProfileView
 from vaccination.views import VaccineViewSet, VaccinationScheduleViewSet, VaccineReviewViewSet, VaccineCampaignViewSet
-from users.views import UserProfileView,DoctorProfileView
+from users.views import UserProfileView,DoctorProfileView, EmailExistsView
 from order.views import OrderViewSet, CartViewSet, CartItemViewSet    
 
 router = routers.DefaultRouter()
@@ -28,5 +28,5 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),  
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
-
+    path('check-email/', EmailExistsView.as_view(), name='check-email'),
 ]

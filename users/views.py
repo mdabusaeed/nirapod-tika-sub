@@ -1,10 +1,11 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView,CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
 from users.serializers import UserCreateSerializer 
 from .models import User
 from .serializers import UserSerializer,DoctorSerializer
@@ -76,4 +77,24 @@ class DoctorProfileView(ModelViewSet):
         serializer.save()
 
         return Response(serializer.data)
+
+
+class EmailExistsView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        email = request.data.get('email')
+        
+        if not email:
+            return Response(
+                {"error": "Email is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        exists = User.objects.filter(email=email).exists()
+        
+        return Response(
+            {"exists": exists},
+            status=status.HTTP_200_OK
+        )
     
