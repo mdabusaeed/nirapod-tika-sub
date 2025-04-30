@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
-from users.serializers import UserCreateSerializer 
+# from users.serializers import UserCreateSerializer 
 from .models import User
 from .serializers import UserSerializer,DoctorSerializer
 from vaccination.models import VaccinationSchedule  
@@ -15,13 +15,10 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 
-from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from users.utils import email_verification_token
 from django.contrib.sites.shortcuts import get_current_site
 from users.utils import send_activation_email
@@ -152,9 +149,9 @@ class EmailExistsView(APIView):
 User = get_user_model()
 
 @api_view(['GET'])
-def activate_user(request, uid, token):
+def activate_user(request, uidb64, token):
     try:
-        uid = force_str(urlsafe_base64_decode(uid))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         return Response(

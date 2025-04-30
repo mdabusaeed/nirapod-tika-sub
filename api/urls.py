@@ -31,6 +31,6 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
     path('check-email/', EmailExistsView.as_view(), name='check-email'),
-    path('activate/<str:uid>/<str:token>/', activate_user, name='activate_user'),
+    path('activate/<str:uidb64>/<str:token>/', activate_user, name='activate_user'),
     path('resend-activation/', resend_activation_email, name='resend_activation_email'),    
 ]
