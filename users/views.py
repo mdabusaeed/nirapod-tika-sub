@@ -98,3 +98,19 @@ class EmailExistsView(APIView):
             status=status.HTTP_200_OK
         )
     
+    def get(self, request):
+        email = request.query_params.get('email')
+        
+        if not email:
+            return Response(
+                {"error": "Email parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        exists = User.objects.filter(email=email).exists()
+        
+        return Response(
+            {"exists": exists},
+            status=status.HTTP_200_OK
+        )
+    
