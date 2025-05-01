@@ -15,8 +15,8 @@ class VaccineViewSet(ModelViewSet):
     serializer_class = VaccineSerializer
 
     def perform_create(self, serializer):
-        if self.request.user.role != 'doctor':
-            raise PermissionDenied("Only doctors can add vaccines.")
+        if self.request.user.role not in ['doctor', 'admin']:
+            raise PermissionDenied("Only doctors and admins can add vaccines.")
         serializer.save(created_by=self.request.user)  
         images = self.request.FILES.getlist('images')
         for image in images:

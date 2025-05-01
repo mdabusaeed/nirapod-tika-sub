@@ -14,7 +14,7 @@ class Vaccine(models.Model):
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
     doses_required = models.IntegerField(default=1) 
     dose_intervals = models.JSONField(default=list) 
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'doctor'})
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role__in': ['doctor', 'admin']})
 
     def clean(self):
         if len(self.dose_intervals) != self.doses_required - 1:
