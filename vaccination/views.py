@@ -22,9 +22,17 @@ class VaccineViewSet(ModelViewSet):
             print(f"Request data: {request.data}")
             print(f"Request FILES: {request.FILES}")
             
+            # সব মডেলের জরুরি ফিল্ডগুলি নিশ্চিত করি
+            data = request.data.copy()
+            if 'stock' not in data or data['stock'] is None:
+                data['stock'] = 0
+                print("Setting default stock to 0")
+            
             # সাধারণ মেথড ব্যবহার করি
-            serializer = self.get_serializer(data=request.data)
+            serializer = self.get_serializer(data=data)
+            print(f"Serializer data before validation: {serializer.initial_data}")
             serializer.is_valid(raise_exception=True)
+            print(f"Serializer valid data: {serializer.validated_data}")
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
