@@ -22,7 +22,7 @@ class VaccinationScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VaccinationSchedule
-        fields = ['id', 'patient', 'vaccine', 'campaign',"payment_method", 'vaccine_name', 'dose_dates']
+        fields = ['id', 'patient', 'vaccine', 'campaign', 'payment_method', 'vaccine_name', 'dose_dates', 'status']
         extra_kwargs = {'patient': {'read_only': True}}  
 
     def create(self, validated_data):
