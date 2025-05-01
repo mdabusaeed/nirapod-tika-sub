@@ -9,6 +9,7 @@ from .models import Vaccine, VaccinationSchedule, VaccineReview, VaccineCampaign
 from .serializers import VaccineSerializer, VaccinationScheduleSerializer, VaccineReviewSerializer, VaccineCampaignSerializer
 from django.conf import settings
 from .models import VaccineImage
+from django.db import transaction
 
 class VaccineViewSet(ModelViewSet):
     queryset = Vaccine.objects.all()
@@ -17,10 +18,12 @@ class VaccineViewSet(ModelViewSet):
     def perform_create(self, serializer):
         if self.request.user.role not in ['doctor', 'admin']:
             raise PermissionDenied("Only doctors and admins can add vaccines.")
-        serializer.save(created_by=self.request.user)  
-        images = self.request.FILES.getlist('images')
-        for image in images:
-            VaccineImage.objects.create(vaccine=serializer.instance, image=image)
+        
+        with transaction.atomic():
+            vaccine = serializer.save(created_by=self.request.user)
+            images = self.request.FILES.getlist('images')
+            for image in images:
+                VaccineImage.objects.create(vaccine=vaccine, image=image)
 
 class VaccinationScheduleViewSet(ModelViewSet):
     serializer_class = VaccinationScheduleSerializer

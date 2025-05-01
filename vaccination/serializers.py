@@ -15,6 +15,28 @@ class VaccineSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','price', 'manufacturer', 'dose_intervals', 'doses_required','created_by', "images"]
         # read_only_fields = ['created_by']  
 
+    def validate(self, data):
+        """
+        Check that the dose_intervals and doses_required are consistent.
+        """
+        try:
+            print(f"Validating data: {data}")
+            dose_intervals = data.get('dose_intervals', [])
+            doses_required = data.get('doses_required', 1)
+            
+            print(f"Validating: dose_intervals={dose_intervals}, doses_required={doses_required}")
+            
+            if doses_required > 1 and len(dose_intervals) != doses_required - 1:
+                msg = f"Dose intervals must have exactly doses_required - 1 entries. Got {len(dose_intervals)} intervals but need {doses_required - 1}."
+                print(f"Serializer validation error: {msg}")
+                raise serializers.ValidationError(msg)
+                
+            return data
+            
+        except Exception as e:
+            print(f"Error in validate method: {str(e)}")
+            raise
+
 
 class VaccinationScheduleSerializer(serializers.ModelSerializer):
     vaccine_name = serializers.CharField(source='vaccine.name', read_only=True)

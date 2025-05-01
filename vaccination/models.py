@@ -17,8 +17,19 @@ class Vaccine(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role__in': ['doctor', 'admin']})
 
     def clean(self):
-        if len(self.dose_intervals) != self.doses_required - 1:
-            raise ValueError("Dose intervals must have exactly doses_required - 1 entries.")
+        try:
+            # ডিবাগিং প্রিন্ট
+            print(f"Cleaning vaccine: dose_intervals={self.dose_intervals}, doses_required={self.doses_required}")
+            
+            if len(self.dose_intervals) != self.doses_required - 1:
+                msg = f"Dose intervals must have exactly doses_required - 1 entries. Got {len(self.dose_intervals)} intervals but need {self.doses_required - 1}."
+                print(f"Validation error: {msg}")
+                raise ValueError(msg)
+            
+            print("Validation passed")
+        except Exception as e:
+            print(f"Error in clean method: {str(e)}")
+            raise
 
     def __str__(self):
         return f"{self.name} ({self.doses_required} doses, intervals {self.dose_intervals})"
