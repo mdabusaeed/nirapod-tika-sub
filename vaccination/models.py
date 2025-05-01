@@ -12,27 +12,10 @@ class Vaccine(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2) 
     stock = models.PositiveBigIntegerField()
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
-    doses_required = models.IntegerField(default=1) 
-    dose_intervals = models.JSONField(default=list) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role__in': ['doctor', 'admin']})
 
-    def clean(self):
-        try:
-            # ডিবাগিং প্রিন্ট
-            print(f"Cleaning vaccine: dose_intervals={self.dose_intervals}, doses_required={self.doses_required}")
-            
-            if len(self.dose_intervals) != self.doses_required - 1:
-                msg = f"Dose intervals must have exactly doses_required - 1 entries. Got {len(self.dose_intervals)} intervals but need {self.doses_required - 1}."
-                print(f"Validation error: {msg}")
-                raise ValueError(msg)
-            
-            print("Validation passed")
-        except Exception as e:
-            print(f"Error in clean method: {str(e)}")
-            raise
-
     def __str__(self):
-        return f"{self.name} ({self.doses_required} doses, intervals {self.dose_intervals})"
+        return f"{self.name}"
 
 class VaccineImage(models.Model):
     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE, related_name='images')
@@ -62,26 +45,26 @@ class VaccinationSchedule(models.Model):
     ('online', 'Online Payment'),
     ('cod', 'Cash on Delivery'),
     ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cod')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def save(self, *args, **kwargs):
-
         if not self.dose_dates:
-            dose_intervals = self.vaccine.dose_intervals
-            first_dose_date = kwargs.get('first_dose_date')  
-
-            if first_dose_date:
-                self.dose_dates = [first_dose_date]  
-                for interval in dose_intervals:
-                    self.dose_dates.append(self.dose_dates[-1] + timedelta(days=interval))  
-            else:
-                self.dose_dates = [timezone.now().strftime('%Y-%m-%dT%H:%M:%S')]  
+            # Simply set the current date as the vaccination date
+            self.dose_dates = [timezone.now().strftime('%Y-%m-%dT%H:%M:%S')]
 
         super(VaccinationSchedule, self).save(*args, **kwargs)
 
-
-        def __str__(self):
-            return f"{self.patient.first_name} - {self.vaccine.name} ({len(self.dose_dates)} doses) - {self.payment_method}"
+    def __str__(self):
+        return f"{self.patient.first_name} - {self.vaccine.name} - {self.payment_method}"
 
 
 class VaccineReview(models.Model):
