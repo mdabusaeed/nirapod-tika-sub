@@ -3,8 +3,9 @@ from rest_framework_nested import routers
 from users.views import UserProfileView
 from vaccination.views import VaccineViewSet, VaccinationScheduleViewSet, VaccineReviewViewSet, VaccineCampaignViewSet, DebugApiView
 from users.views import UserProfileView,DoctorProfileView, EmailExistsView
-from order.views import OrderViewSet, CartViewSet, CartItemViewSet    
+from order.views import OrderViewSet, CartViewSet, CartItemViewSet, initiate_payment
 from users.views import resend_activation_email, activate_user
+
 
 router = routers.DefaultRouter()
 router.register('patient-profile', UserProfileView, basename='patient-profile')
@@ -34,4 +35,5 @@ urlpatterns = [
     path('activate/<str:uidb64>/<str:token>/', activate_user, name='activate_user'),
     path('resend-activation/', resend_activation_email, name='resend_activation_email'),
     path('debug/', DebugApiView.as_view(), name='debug_api'),    
+    path('payment/', initiate_payment, name='initiate_payment'),
 ]

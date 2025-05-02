@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 from order.models import Cart, CartItem, Order, OrderItem
@@ -10,6 +10,8 @@ from rest_framework.decorators import action
 from order.services import OrderService
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view
+from sslcommerz_lib import SSLCOMMERZ 
 
 class CartViewSet(CreateModelMixin,RetrieveModelMixin, DestroyModelMixin,GenericViewSet):
     serializer_class = CartSerializer
@@ -90,4 +92,43 @@ class OrderViewSet(ModelViewSet):
         if self.request.user.is_staff:
             return Order.objects.prefetch_related('order_items__product').all()
         return Order.objects.prefetch_related('order_items__product').filter(user = self.request.user)
+    
+@api_view(['POST'])
+def initiate_payment(request):
+    amount = request.data.get('amount')
+    user = request.user
+    order_id = request.data.get('orderId')
+    num_items = request.data.get('numItems')
+
+    settings = { 'store_id':'tikac681426db54eb9', 'store_pass':'tikac681426db54eb9@ssl', 'issandbox': True }
+    sslcz = SSLCOMMERZ(settings)
+    post_body = {}
+    post_body['total_amount'] = amount
+    post_body['currency'] = "BDT"
+    post_body['tran_id'] = f"txn_{order_id}"
+    post_body['success_url'] = "http://localhost:5173/payment/success/"
+    post_body['fail_url'] = "http://localhost:5173/payment/fail/"
+    post_body['cancel_url'] = "http://localhost:5173/payment/cancel/"
+    post_body['emi_option'] = 0
+    post_body['cus_name'] = user.first_name + " " + user.last_name
+    post_body['cus_email'] = user.email
+    post_body['cus_phone'] = user.phone_number
+    post_body['cus_add1'] = user.address
+    post_body['cus_city'] = "Dhaka"
+    post_body['cus_country'] = "Bangladesh"
+    post_body['shipping_method'] = "NO"
+    post_body['multi_card_name'] = ""
+    post_body['num_of_item'] = num_items
+    post_body['product_name'] = "Tika"
+    post_body['product_category'] = "Medicine"
+    post_body['product_profile'] = "Tika"
+
+
+    response = sslcz.createSession(post_body) # API response
+
+    if response.get('status') == 'SUCCESS':
+        return Response({'payment_url' : response['GatewayPageURL']})
+    else:
+        return Response({'error' : 'Payment faild'}, status=status.HTTP_400_BAD_REQUEST)
+    
     
