@@ -58,8 +58,43 @@ class UserProfileView(ModelViewSet):
         print(f"Request data: {request.data}")
         
         try:
+            # Convert request.data to mutable dict if it's a QueryDict
+            if hasattr(request.data, 'copy'):
+                data = request.data.copy()  # For QueryDict
+            else:
+                data = dict(request.data)   # For regular dict
+            
+            # Prevent unique validation errors by removing fields with same values
+            # Handle both string and list values (QueryDict can have different formats)
+            
+            # Email check
+            email_value = data.get('email')
+            if email_value:
+                # Handle list format from QueryDict
+                if isinstance(email_value, list) and email_value[0] == user.email:
+                    data.pop('email')
+                # Handle string format
+                elif email_value == user.email:
+                    data.pop('email')
+                
+            # Phone number check
+            phone_value = data.get('phone_number')
+            if phone_value:
+                if isinstance(phone_value, list) and phone_value[0] == user.phone_number:
+                    data.pop('phone_number')
+                elif phone_value == user.phone_number:
+                    data.pop('phone_number')
+                
+            # NID check
+            nid_value = data.get('nid')
+            if nid_value:
+                if isinstance(nid_value, list) and nid_value[0] == user.nid:
+                    data.pop('nid')
+                elif nid_value == user.nid:
+                    data.pop('nid')
+            
             # Only update fields that are explicitly provided in request.data
-            serializer = self.get_serializer(user, data=request.data, partial=True)
+            serializer = self.get_serializer(user, data=data, partial=True)
             
             if not serializer.is_valid():
                 print(f"Serializer errors: {serializer.errors}")
@@ -67,7 +102,9 @@ class UserProfileView(ModelViewSet):
             
             serializer.save()
             
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # Get updated user data for response
+            updated_user = self.get_serializer(user)
+            return Response(updated_user.data, status=status.HTTP_200_OK)
         except Exception as e:
             import traceback
             print(f"Error in update: {str(e)}")
@@ -98,8 +135,43 @@ class DoctorProfileView(ModelViewSet):
         print(f"Request data: {request.data}")
         
         try:
+            # Convert request.data to mutable dict if it's a QueryDict
+            if hasattr(request.data, 'copy'):
+                data = request.data.copy()  # For QueryDict
+            else:
+                data = dict(request.data)   # For regular dict
+            
+            # Prevent unique validation errors by removing fields with same values
+            # Handle both string and list values (QueryDict can have different formats)
+            
+            # Email check
+            email_value = data.get('email')
+            if email_value:
+                # Handle list format from QueryDict
+                if isinstance(email_value, list) and email_value[0] == user.email:
+                    data.pop('email')
+                # Handle string format
+                elif email_value == user.email:
+                    data.pop('email')
+                
+            # Phone number check
+            phone_value = data.get('phone_number')
+            if phone_value:
+                if isinstance(phone_value, list) and phone_value[0] == user.phone_number:
+                    data.pop('phone_number')
+                elif phone_value == user.phone_number:
+                    data.pop('phone_number')
+                
+            # NID check
+            nid_value = data.get('nid')
+            if nid_value:
+                if isinstance(nid_value, list) and nid_value[0] == user.nid:
+                    data.pop('nid')
+                elif nid_value == user.nid:
+                    data.pop('nid')
+            
             # Only update fields that are explicitly provided in request.data
-            serializer = self.get_serializer(user, data=request.data, partial=True)
+            serializer = self.get_serializer(user, data=data, partial=True)
             
             if not serializer.is_valid():
                 print(f"Serializer errors: {serializer.errors}")
@@ -107,7 +179,9 @@ class DoctorProfileView(ModelViewSet):
             
             serializer.save()
             
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # Get updated user data for response
+            updated_user = self.get_serializer(user)
+            return Response(updated_user.data, status=status.HTTP_200_OK)
         except Exception as e:
             import traceback
             print(f"Error in update: {str(e)}")
