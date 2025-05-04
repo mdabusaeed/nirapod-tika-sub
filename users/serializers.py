@@ -10,9 +10,10 @@ class UserCreateSerializer(BaseUserRegistrationSerializer):
         fields = ('id', 'phone_number','nid', 'password', 'first_name', 'last_name', 'address', 'email')
         extra_kwargs = {'password': {'write_only': True}}
 
-class UserSerializer(BaseUserSerializer):
+class UserSerializer(serializers.ModelSerializer):
     
-    class Meta(BaseUserSerializer.Meta):
+    class Meta:
+        model = User
         ref_name = "CustomUserSerializer"
         fields = ('id', 'phone_number','nid', 'first_name', 'last_name', 'address', 'email','medical_details')
         extra_kwargs = {

@@ -26,6 +26,7 @@ from users.utils import send_activation_email
 
 class UserProfileView(ModelViewSet):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_staff:  
@@ -51,20 +52,32 @@ class UserProfileView(ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-
-        # Only update fields that are explicitly provided in request.data
-        serializer = self.get_serializer(user, data=request.data, partial=True)
         
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Debug info
+        print(f"User ID: {user.id}, Role: {user.role}")
+        print(f"Request data: {request.data}")
         
-        serializer.save()
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            # Only update fields that are explicitly provided in request.data
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            
+            if not serializer.is_valid():
+                print(f"Serializer errors: {serializer.errors}")
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.save()
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            import traceback
+            print(f"Error in update: {str(e)}")
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
 class DoctorProfileView(ModelViewSet):
     serializer_class = DoctorSerializer
+    permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
 
@@ -79,16 +92,27 @@ class DoctorProfileView(ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-
-        # Only update fields that are explicitly provided in request.data
-        serializer = self.get_serializer(user, data=request.data, partial=True)
         
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Debug info
+        print(f"Doctor ID: {user.id}, Role: {user.role}")
+        print(f"Request data: {request.data}")
         
-        serializer.save()
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            # Only update fields that are explicitly provided in request.data
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            
+            if not serializer.is_valid():
+                print(f"Serializer errors: {serializer.errors}")
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.save()
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            import traceback
+            print(f"Error in update: {str(e)}")
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EmailExistsView(APIView):
