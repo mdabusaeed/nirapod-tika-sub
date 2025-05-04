@@ -52,18 +52,15 @@ class UserProfileView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         user = self.get_object()
 
+        # Only update fields that are explicitly provided in request.data
         serializer = self.get_serializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        for field, value in serializer.validated_data.items():
-            if value == "":
-               
-                continue
-            setattr(user, field, value)
         
-        user.save()  
-
-        return Response(serializer.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save()
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class DoctorProfileView(ModelViewSet):
@@ -83,11 +80,15 @@ class DoctorProfileView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         user = self.get_object()
 
+        # Only update fields that are explicitly provided in request.data
         serializer = self.get_serializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer.save()
-
-        return Response(serializer.data)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class EmailExistsView(APIView):
