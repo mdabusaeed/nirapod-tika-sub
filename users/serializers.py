@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         ref_name = "CustomUserSerializer"
-        fields = ('id', 'phone_number','nid', 'first_name', 'last_name', 'address', 'email','medical_details')
+        fields = ('id', 'phone_number','nid', 'first_name', 'last_name', 'address', 'email','medical_details','role')
         extra_kwargs = {
             'email': {'required': False},
             'phone_number': {'required': False},
