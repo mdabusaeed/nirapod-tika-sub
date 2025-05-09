@@ -145,7 +145,11 @@ class VaccineReviewViewSet(ModelViewSet):
 class VaccineCampaignViewSet(ModelViewSet):
     queryset = VaccineCampaign.objects.all()
     serializer_class = VaccineCampaignSerializer
-    permission_classes = [IsAdminUser]
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
 
 class DebugApiView(APIView):
     permission_classes = [IsAuthenticated]
